@@ -2,15 +2,15 @@ package animals;
 
 import java.awt.*;
 
-public class Red extends ColorfulAnimal_Decorator{
+public class Blue_Animal_Decorator extends Animal_Decorator{
 
-    Red(Animal animal){
+    Blue_Animal_Decorator(Animal animal){
         super(animal);
-        animal.setColor("Red");
+        animal.setColor("Blue");
     }
     @Override
     public void loadImages(String nm) {
-        animal.loadImages(animal.getPhoto_name() + "b");
+        animal.loadImages(animal.getPhoto_name() + "b_");
     }
 
     @Override
@@ -20,6 +20,6 @@ public class Red extends ColorfulAnimal_Decorator{
 
     @Override
     public String getColor() {
-        return "Red";
+        return "Blue";
     }
 }
