@@ -5,13 +5,14 @@ import java.awt.*;
 public class Natural_Animal_Decorator extends Animal_Decorator{
 
 
-    Natural_Animal_Decorator(Animal animal){
+    public Natural_Animal_Decorator(Animal animal){
         super(animal);
         animal.setColor("Natural");
+        this.loadImages(animal.getPhoto_name());
     }
     @Override
     public void loadImages(String nm) {
-        animal.loadImages(animal.getPhoto_name() + "n_");
+        animal.loadImages(nm + "n_");
     }
 
     @Override

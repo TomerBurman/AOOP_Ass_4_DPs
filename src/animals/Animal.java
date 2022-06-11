@@ -9,10 +9,7 @@ package animals;
 import diet.IDiet;
 import food.EFoodType;
 import food.IEdible;
-import graphics.IAnimalBehavior;
-import graphics.IDrawable;
-import graphics.ZooFrame;
-import graphics.ZooPanel;
+import graphics.*;
 import mobility.*;
 import mobility.Point;
 import javax.imageio.ImageIO;
@@ -23,7 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 
-public abstract class Animal extends Mobile implements IEdible, IDrawable, IAnimalBehavior,Runnable {
+public abstract class Animal extends Mobile implements IAnimalInterface {
     /**
      * attributes :
      * name - name of the animal
@@ -512,6 +509,11 @@ public abstract class Animal extends Mobile implements IEdible, IDrawable, IAnim
             System.out.println("done");
             this.notifyAll();
         }
+    }
+
+    @Override
+    public Animal getAnimal() {
+        return this;
     }
 }
 

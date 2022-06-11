@@ -1,7 +1,6 @@
 package graphics;
 
 import animals.Animal;
-import food.EFoodType;
 import food.IEdible;
 import mobility.Point;
 
@@ -9,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
@@ -35,18 +33,19 @@ public class ZooPanel extends JPanel implements Runnable {
     private static final int max_animals = 10;
     private static final int corePool = 10;
     private static final int maximumPoolSize = 10;
-    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(5);
-    private static final BlockingQueue<Animal> waiting_queue = new ArrayBlockingQueue<>(5);
+    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(5);
+    private static final BlockingQueue<IAnimalInterface> waiting_queue = new ArrayBlockingQueue<>(5);
 
 
     private static ExecutorService executor;
     private static JDialog dialog;
-    private static final ArrayList<Animal> animal_list = new ArrayList<>();
+    private static final ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
     private static drawPanel draw_panel;
     private static ButtonPanel button_panel;
     private static ImageIcon backGround = null;
     private static IEdible food=null;
     private Thread controller;
+
 
     private volatile static ZooPanel instance=null;
 
@@ -100,9 +99,9 @@ public class ZooPanel extends JPanel implements Runnable {
             int i = 0;
             Animal animal1, animal2;
             while (i < num_of_Animals) {// checks all animals with all animals, if one can eat the other.
-                animal1 = animal_list.get(i);
+                animal1 = animal_list.get(i).getAnimal();
                 for (int j = 0; j < num_of_Animals; j++) {
-                    animal2 = animal_list.get(j);
+                    animal2 = animal_list.get(j).getAnimal();
                     if (animal1.getWeight() > 2 * animal2.getWeight() && animal1.calcDistance(animal2.getLocation()) <= animal2.getSize() && animal1 != animal2)
                         if (animal1.eat(animal2)) {
                             synchronized (animal2) {
@@ -127,14 +126,17 @@ public class ZooPanel extends JPanel implements Runnable {
                     i++;
             }
             if (food != null) { // if food was placed on the screen
-                for (Animal animal : animal_list) {
+                for (IAnimalInterface animal_dec : animal_list) {
+                    Animal animal = animal_dec.getAnimal();
                     synchronized (animal) {
                         if (animal.getDiet().canEat(food.getFoodType())) {
                             animal.setExistingFood(true);
                             if (animal.calcDistance(new Point(draw_panel.getWidth() / 2, draw_panel.getHeight() / 2 + 12)) <= animal.getEAT_DISTANCE()) {
                                 animal.eat(food);
-                                for (Animal temp_animal : animal_list)
+                                for (IAnimalInterface temp_animal_dec : animal_list) {
+                                    Animal temp_animal = temp_animal_dec.getAnimal();
                                     temp_animal.setExistingFood(false);
+                                }
                                 food = null;
                                 break;
                             }
@@ -154,7 +156,7 @@ public class ZooPanel extends JPanel implements Runnable {
      */
     public static boolean isChanged() {
         boolean flag = false;
-        for (Animal animal : animal_list){
+        for (IAnimalInterface animal : animal_list){
             if (animal.getChanges()) {
                 synchronized (animal) {
                     animal.setChanges(false);
@@ -197,7 +199,7 @@ public class ZooPanel extends JPanel implements Runnable {
      * getAnimalList - returns animal_list
      * @return ArrayList<Animal>
      */
-   public static ArrayList<Animal> getAnimalList(){return animal_list;}
+   public static ArrayList<IAnimalInterface> getAnimalList(){return animal_list;}
 
     /**
      * Get Controller thread
@@ -227,6 +229,7 @@ public class ZooPanel extends JPanel implements Runnable {
         private JButton wake_up = new JButton("Wake up");
         private JButton clear = new JButton("Clear");
         private JButton food = new JButton("Food");
+        private JButton animal_color = new JButton("Change Color");
         private JButton info = new JButton("Info");
         private JButton exit = new JButton("Exit");
 
@@ -241,12 +244,13 @@ public class ZooPanel extends JPanel implements Runnable {
             animalButton();
             GridLayout lay = new GridLayout(1,0);
             this.setLayout(lay);
-            lay.setHgap(10);
+            lay.setHgap(5);
             this.add(add_Animal);
             this.add(sleep);
             this.add(wake_up);
             this.add(clear);
             this.add(food);
+            this.add(animal_color);
             this.add(info);
             this.add(exit);
 
@@ -282,7 +286,7 @@ public class ZooPanel extends JPanel implements Runnable {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if(num_of_Animals > 0 ){
-                        for(Animal animal : animal_list)
+                        for(IAnimalInterface animal : animal_list)
                             animal.setSuspended();
                     }
                     else
@@ -294,7 +298,7 @@ public class ZooPanel extends JPanel implements Runnable {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (num_of_Animals > 0) {
-                        for (Animal animal : animal_list) {
+                        for (IAnimalInterface animal : animal_list) {
                             synchronized (animal) {
                                 animal.setResumed();
                                 animal.notifyAll();
@@ -334,7 +338,8 @@ public class ZooPanel extends JPanel implements Runnable {
                     queue.clear();
                     waiting_queue.clear();
                     if(animal_list.size() > 0) {
-                        for(Animal animal : animal_list) {
+                        for(IAnimalInterface animal_dec : animal_list) {
+                            Animal animal = animal_dec.getAnimal();
                             synchronized (animal) {
                                 animal.setThreadExit(true);
                                 try {
@@ -362,6 +367,16 @@ public class ZooPanel extends JPanel implements Runnable {
                 public void actionPerformed(ActionEvent e) {
                     FoodDialog food = new FoodDialog();
                     manageZoo();
+                }
+            });
+
+            this.animal_color.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(animal_list.size() >0)
+                        new ChangeColorDialog();
+                    else
+                        JOptionPane.showMessageDialog(button_panel,"Animals do not exist.","Error",JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -411,7 +426,7 @@ public class ZooPanel extends JPanel implements Runnable {
             if(food != null)
                 ((IDrawable)food).drawObject(g);
             synchronized (animal_list) {
-                for (Animal animal : animal_list)
+                for (IAnimalInterface animal : animal_list)
                     animal.drawObject(g);
             }
         }
@@ -440,17 +455,19 @@ public class ZooPanel extends JPanel implements Runnable {
     public static void addAnimal(Animal animal){
         if(num_of_Animals < max_animals) {
                 animal_list.add(animal);
-                for (Animal animal_to_check : animal_list)
+                for (IAnimalInterface animal_to_check_dec : animal_list) {
+                    Animal animal_to_check = animal_to_check_dec.getAnimal();
                     if (animal_to_check.isThreadSuspended()) {
                         animal.setSuspended();
                         break;
                     }
+                }
             }
         else if(queue.size() < 5){
             waiting_queue.add(animal);
             JOptionPane.showMessageDialog(dialog,"Animal added to waiting queue","Notification",JOptionPane.INFORMATION_MESSAGE);
         }
-        executor.execute(animal);
+        executor.execute((IAnimalInterface)animal);
         System.out.println(executor);
     }
 

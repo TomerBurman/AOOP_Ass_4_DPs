@@ -1,6 +1,7 @@
 package animals;
 
 import food.EFoodType;
+import food.IEdible;
 import graphics.IAnimalInterface;
 
 import java.awt.*;
@@ -73,4 +74,6 @@ public abstract class Animal_Decorator implements IAnimalInterface {
     public void run() {
         animal.run();
     }
+
+
 }

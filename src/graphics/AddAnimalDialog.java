@@ -39,8 +39,8 @@ public class AddAnimalDialog extends JDialog {
     private static Point location; // location
     private JButton create_animal = new JButton("Create");
 
-    private Animal_factory factory;
-    private Factory_producer producer;
+    private static Animal_factory factory;
+    private static Factory_producer producer;
 
     public static String getAnimalName(){
         return name;
@@ -88,7 +88,7 @@ public class AddAnimalDialog extends JDialog {
     private AddAnimalDialog() {
         this.setTitle("Add animal");
         this.setLayout(new BorderLayout());
-
+        producer = new Factory_producer();
         create_animal.addActionListener(new ActionListener() {
             /**
              * actionPerformed - when create_animal button is pressed, extracts data from using buildFields(),
@@ -103,15 +103,7 @@ public class AddAnimalDialog extends JDialog {
                     JOptionPane.showMessageDialog(create_animal, "Animal must have a name ! ", "Error message", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                Animal animalToAdd=null;
-                switch (select.animal_choice.getSelectedItem().toString()) {
-                    case "Lion" -> animalToAdd = new Lion(name, location, col, size);
-                    case "Bear" -> animalToAdd = new Bear(name, location, col, size);
-                    case "Giraffe" -> animalToAdd = new Giraffe(name, location, col, size, changing_field);
-                    case "Turtle" -> animalToAdd = new Turtle(name, location, col, size, age);
-                    case "Elephant" -> animalToAdd = new Elephant(name, location, col, size, changing_field);
-
-                }
+                Animal animalToAdd= factory.makeAnimal(select.animal_choice.getSelectedItem().toString());
                 if(animalToAdd != null) {
                     animalToAdd.setSpeed(horSpeed,verSpeed);
                     ZooPanel.addAnimal(animalToAdd);
@@ -373,12 +365,18 @@ public class AddAnimalDialog extends JDialog {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(e.getSource().equals(omnivore))
+            if(e.getSource().equals(omnivore)) {
                 animals_choices = omnivores;
-            else if(e.getSource().equals(herbivore))
+                factory = producer.getFactory("Omnivore");
+            }
+            else if(e.getSource().equals(herbivore)) {
                 animals_choices = herbivores;
-            else if(e.getSource().equals(carnivore))
+                factory = producer.getFactory("Herbivore");
+            }
+            else if(e.getSource().equals(carnivore)) {
                 animals_choices = carnivores;
+                factory = producer.getFactory("Carnivore");
+            }
             else if(!(e.getSource().equals(omnivore) || e.getSource().equals(herbivore) || e.getSource().equals(carnivore)))
                 return;
             if(e.getSource().equals(omnivore) || e.getSource().equals(herbivore) || e.getSource().equals(carnivore)) {

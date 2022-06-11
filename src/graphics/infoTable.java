@@ -15,7 +15,8 @@ public class infoTable{
         animalsInfo = new Object[ZooPanel.getAnimalList().size()+1][colsParams.length];
         int i = 0;
         int total = 0;
-        for(Animal animal:ZooPanel.getAnimalList()){
+        for(IAnimalInterface animal_dec:ZooPanel.getAnimalList()){
+            Animal animal  = animal_dec.getAnimal();
            animalsInfo[i][0] = animal.getClass().getSimpleName();
            animalsInfo[i][1] = animal.getAnimalName();
            animalsInfo[i][2] = animal.getColor();

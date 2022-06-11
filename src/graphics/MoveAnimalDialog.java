@@ -52,8 +52,8 @@ public class MoveAnimalDialog extends JDialog {
 
         private void buildAnimalList() {
             animalsList = new JComboBox<>();
-            for(Animal animal : ZooPanel.getAnimalList()) {
-                animalsList.addItem(animal);
+            for(IAnimalInterface animal : ZooPanel.getAnimalList()) {
+                animalsList.addItem(animal.getAnimal());
             }
         }
 

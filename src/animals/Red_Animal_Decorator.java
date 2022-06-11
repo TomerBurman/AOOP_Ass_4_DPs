@@ -4,13 +4,14 @@ import java.awt.*;
 
 public class Red_Animal_Decorator extends Animal_Decorator {
 
-    Red_Animal_Decorator(Animal animal){
+    public Red_Animal_Decorator(Animal animal){
         super(animal);
         animal.setColor("Red");
+        this.loadImages(animal.getPhoto_name());
     }
     @Override
     public void loadImages(String nm) {
-        animal.loadImages(animal.getPhoto_name() + "r_");
+        animal.loadImages(nm + "r_");
     }
 
     @Override
