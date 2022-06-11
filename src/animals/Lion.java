@@ -5,7 +5,7 @@
  * @author : Tomer Burman, Oran Bourak
  */
 package animals;
-import diet.Carnivore;
+import diet.Carnivore_factory;
 import food.*;
 import mobility.Point;
 import java.util.Random;
@@ -24,7 +24,7 @@ public class Lion extends Roaring_animals {
     public Lion(String name,Point location,String col,int size){
         super(name,location,col,size);
         super.setWeight(getSize() * weightFactor);
-        this.setDiet(new Carnivore()); // meat eater
+        this.setDiet(new Carnivore_factory()); // meat eater
         this.loadImages("lio_" + color_choice.get(col) + "_");
 
     }

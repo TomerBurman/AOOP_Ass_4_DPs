@@ -6,7 +6,7 @@
  */
 
 package animals;
-import diet.Omnivore;
+import diet.Omnivore_factory;
 import mobility.Point;
 import privateutil.Roaring_animals;
 
@@ -22,7 +22,7 @@ public class Bear extends Roaring_animals {
     public Bear(String name,Point location,String col,int size){
         super(name,location,col,size);
         this.setWeight(getSize() * weightFactor);
-        this.setDiet(new Omnivore()); // meat eater
+        this.setDiet(new Omnivore_factory()); // meat eater
         this.loadImages("bea_" + color_choice.get(col) + "_");
     }
 

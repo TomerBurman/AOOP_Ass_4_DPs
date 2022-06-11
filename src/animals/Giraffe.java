@@ -5,7 +5,7 @@
  * @author : Tomer Burman, Oran Bourak
  */
 package animals;
-import diet.Herbivore;
+import diet.Herbivore_factory;
 import mobility.*;
 import privateutil.Chewing_animals;
 
@@ -31,7 +31,7 @@ public class Giraffe extends Chewing_animals {
         this.setWeight(getSize() * weightFactor);
         if (!this.setNeckLength(length))
             this.setNeckLength(defaultLength);
-        this.setDiet(new Herbivore());
+        this.setDiet(new Herbivore_factory());
         this.loadImages("grf_" + color_choice.get(color) + "_");
 
     }

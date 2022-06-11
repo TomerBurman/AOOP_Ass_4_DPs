@@ -7,7 +7,7 @@
  */
 
 package animals;
-import diet.Herbivore;
+import diet.Herbivore_factory;
 import mobility.Point;
 import privateutil.Chewing_animals;
 
@@ -30,7 +30,7 @@ public class Turtle extends Chewing_animals {
         this.setWeight(getSize()* weightFactor);
         if(!this.setAge(Age))
             setAge(defaultAge);
-        this.setDiet(new Herbivore());
+        this.setDiet(new Herbivore_factory());
         this.loadImages("trt_" + color_choice.get(col) + "_");
 
 

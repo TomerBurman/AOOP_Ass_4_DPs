@@ -71,7 +71,7 @@ public abstract class Animal extends Mobile implements IEdible, IDrawable, IAnim
         }
     };
     protected final static String default_color = "Natural";
-
+    private String photo_name;
 
 
     /**
@@ -359,6 +359,11 @@ public abstract class Animal extends Mobile implements IEdible, IDrawable, IAnim
         } catch (IOException e) {
             System.out.println("Cannot load image");
         }
+        photo_name = nm.substring(0,4);
+    }
+
+    public String getPhoto_name(){
+        return photo_name;
     }
 
     /**

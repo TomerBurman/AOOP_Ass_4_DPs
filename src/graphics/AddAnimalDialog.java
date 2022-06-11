@@ -6,8 +6,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import animals.*;
+import diet.Animal_factory;
+import diet.Factory_producer;
 import mobility.Point;
 
 /**AddAnimalDialog - JDialog window, creates a dialog window to create an Animal
@@ -28,13 +31,42 @@ public class AddAnimalDialog extends JDialog {
     private volatile static AddAnimalDialog dialog;
     private static Animal_fields field;
     private static SelectAnimal select;
-    private String name,col; // common
-    private int horSpeed,verSpeed;
+    private static String name,col; // common
+    private static int horSpeed,verSpeed;
 
-    private double changing_field; // giraffe and elephant
-    private int age,size; // turtle
-    private Point location; // location
+    private static double changing_field; // giraffe and elephant
+    private static int age,size; // turtle
+    private static Point location; // location
     private JButton create_animal = new JButton("Create");
+
+    private Animal_factory factory;
+    private Factory_producer producer;
+
+    public static String getAnimalName(){
+        return name;
+    }
+    public static Point getPoint(){
+        return location;
+    }
+    public static double getChangingField(){
+        return changing_field;
+    }
+    public static int getHorSpeed(){
+        return horSpeed;
+    }
+    public static int getVerSpeed(){
+        return verSpeed;
+    }
+    public static String getCol(){
+        return col;
+    }
+    public static int getAge(){
+        return age;
+    }
+    public static int getAnimalSize(){
+        return size;
+    }
+
 
     /**
      * makeInstance - singleton pattern - checks if theres an instance of the same class.
@@ -92,7 +124,7 @@ public class AddAnimalDialog extends JDialog {
         this.add(field, BorderLayout.EAST); // adding field panel
         this.add(create_animal,BorderLayout.SOUTH);// adding Create button.
         field.setVisible(false);
-        this.setSize(400, 400);
+        this.setSize(550, 520);
         this.addWindowListener(new WindowAdapter() {
             @Override
             /**
@@ -260,22 +292,64 @@ public class AddAnimalDialog extends JDialog {
          * img - animals Icon image.
          */
         private final JComboBox<String> animal_choice;
-
-        private final String[][] animals_choices = {{"Lion", "Lion.png"}, {"Bear", "Bear.png"}, {"Giraffe", "Giraffe.png"}, {"Turtle", "Turtle.png"}, {"Elephant", "Elephant.png"}};
+        private final JButton herbivore = new JButton("Herbivore");
+        private final JButton carnivore = new JButton("Carnivore");
+        private final JButton omnivore = new JButton("Omnivore");
+//= {{"Lion", "Lion.png"}, {"Bear", "Bear.png"}, {"Giraffe", "Giraffe.png"}, {"Turtle", "Turtle.png"}, {"Elephant", "Elephant.png"}};
+        private String[] animals_choices = {};
+        private String[] herbivores = {"Giraffe","Turtle","Elephant"};
+        private String[] carnivores = {"Lion"};
+        private String[] omnivores = {"Bear"};
         private Image img;
+
+        private class AnimalPanel extends JPanel{
+            public AnimalPanel(){
+                GridBagLayout lay = new GridBagLayout();
+                GridBagConstraints gbc = new GridBagConstraints();
+                this.setLayout(lay);
+                this.add(herbivore);
+                this.add(omnivore);
+                this.add(carnivore);
+                gbc.gridx = 1;
+                gbc.gridy = 1;
+                this.add(animal_choice,gbc);
+
+            }
+        }
 
         /**
          * SelectAnimal - ctor. sets BorderLayout, adds the animals class name to the JComboBox
          * and adds the JComboBox to the panel.
          */
         SelectAnimal() {
+            herbivore.addActionListener(this);
+            omnivore.addActionListener(this);
+            carnivore.addActionListener(this);
             this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Select animal"), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             this.setLayout(new BorderLayout());
-            animal_choice = new JComboBox<String>(); // All enum constants.
-            for (String[] name : animals_choices) // taking animal names.
-                animal_choice.addItem(name[0]);
-            animal_choice.addActionListener(this);
-            this.add(animal_choice, BorderLayout.NORTH);
+            animal_choice = new JComboBox<String>();
+            animal_choice.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(e.getSource().equals(animal_choice)) {
+                        clearFields();
+                        int index = animal_choice.getSelectedIndex();
+                        if(animal_choice.getSelectedItem() == null)
+                            return;
+                        try {
+                            img = ImageIO.read((new File(System.getProperty("user.dir") + "\\src\\photos\\" + animal_choice.getSelectedItem() + ".png")));
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        field.changing_f.setVisible(!field.fields[index].equals("")); // if not lion changing field is visible.
+                        field.changing_param.setText(field.fields[index]);
+                        field.setVisible(true);
+                        repaint();
+                    }
+                }
+            });
+            this.add(new AnimalPanel(), BorderLayout.NORTH);
+
         }
 
         /**
@@ -299,18 +373,21 @@ public class AddAnimalDialog extends JDialog {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            clearFields();
-            int index = animal_choice.getSelectedIndex();
-            try {
-                img = ImageIO.read((new File(System.getProperty("user.dir") +"\\src\\photos\\" + animal_choice.getSelectedItem() + ".png")));
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if(e.getSource().equals(omnivore))
+                animals_choices = omnivores;
+            else if(e.getSource().equals(herbivore))
+                animals_choices = herbivores;
+            else if(e.getSource().equals(carnivore))
+                animals_choices = carnivores;
+            else if(!(e.getSource().equals(omnivore) || e.getSource().equals(herbivore) || e.getSource().equals(carnivore)))
+                return;
+            if(e.getSource().equals(omnivore) || e.getSource().equals(herbivore) || e.getSource().equals(carnivore)) {
+                animal_choice.removeAllItems();
+                for (String name : animals_choices) { // taking animal names.
+                    if (name != null)
+                        animal_choice.addItem(name);
+                }
             }
-            field.changing_f.setVisible(!field.fields[index].equals("")); // if not lion changing field is visible.
-            field.changing_param.setText(field.fields[index]);
-            field.setVisible(true);
-            this.repaint();
-
         }
 
         /**

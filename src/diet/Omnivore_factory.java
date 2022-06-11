@@ -1,8 +1,10 @@
 package diet;
 
 import animals.Animal;
+import animals.Bear;
 import food.EFoodType;
 import food.IEdible;
+import graphics.AddAnimalDialog;
 
 
 // Ask about implementation of methods : canEat and eat if they're supposed to be static. 
@@ -11,13 +13,13 @@ import food.IEdible;
  * @version 1
  * @author Oran Bourak, Tomer Burman.
  */
-public class Omnivore implements IDiet {
+public class Omnivore_factory implements IDiet,Animal_factory {
 
 
 
     //Delegators
-    private final IDiet herb_Eater = new Herbivore(); // herb eater methods
-    private final IDiet meat_Eater = new Carnivore(); // meat eater methods
+    private final IDiet herb_Eater = new Herbivore_factory(); // herb eater methods
+    private final IDiet meat_Eater = new Carnivore_factory(); // meat eater methods
 
 
     /** canEat - using herb_Eater and meat_Eater methods
@@ -43,5 +45,13 @@ public class Omnivore implements IDiet {
             return this.herb_Eater.eat(animal, food); // Herbivore
         }
         return 0;
+    }
+
+    @Override
+    public Animal makeAnimal(String animal) {
+        if(animal.equals("Bear"))
+            return new Bear(AddAnimalDialog.getAnimalName(), AddAnimalDialog.getPoint(), AddAnimalDialog.getCol(), AddAnimalDialog.getAnimalSize());
+        return null;
+
     }
 }

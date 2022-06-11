@@ -1,8 +1,10 @@
 package diet;
 
 import animals.Animal;
+import animals.Lion;
 import food.EFoodType;
 import food.IEdible;
+import graphics.AddAnimalDialog;
 
 /**
  * Carnivore - Class represents objects that only eat meat
@@ -10,7 +12,7 @@ import food.IEdible;
  * @author Tomer Burman, Oran Bourak
  *
  */
-public class Carnivore implements IDiet{
+public class Carnivore_factory implements IDiet, Animal_factory{
 
     /**
      *
@@ -21,6 +23,7 @@ public class Carnivore implements IDiet{
     public boolean canEat(EFoodType food) {
         return (food == EFoodType.MEAT); // if the food is meat returns true, else false.
     }
+
 
     /**
      * eat
@@ -34,6 +37,15 @@ public class Carnivore implements IDiet{
         if (this.canEat(food.getFoodType()))
             return animal.getWeight()*0.1;
         return 0;
+
+    }
+
+
+    @Override
+    public Animal makeAnimal(String animal) {
+        if(animal.equals("Lion"))
+            return new Lion(AddAnimalDialog.getAnimalName(), AddAnimalDialog.getPoint(), AddAnimalDialog.getCol(), AddAnimalDialog.getAnimalSize());
+        return null;
 
     }
 }

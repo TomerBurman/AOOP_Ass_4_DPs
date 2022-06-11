@@ -5,7 +5,7 @@
  * @author : Tomer Burman, Oran Bourak
  */
 package animals;
-import diet.Herbivore;
+import diet.Herbivore_factory;
 import mobility.Point;
 import privateutil.Chewing_animals;
 
@@ -29,7 +29,7 @@ public class Elephant extends Chewing_animals {
         this.setWeight(getSize() * weightFactor);
         if (!setTrunkLength(trunkLength))
             setTrunkLength(trunkDefaultLength);
-        this.setDiet(new Herbivore());
+        this.setDiet(new Herbivore_factory());
         this.loadImages("elf_" + color_choice.get(col) + "_");
 
     }
