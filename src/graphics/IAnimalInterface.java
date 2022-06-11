@@ -6,4 +6,5 @@ import food.IEdible;
 
 public interface IAnimalInterface extends IDrawable,IAnimalBehavior, IEdible, Runnable{
     Animal getAnimal();
+    void run();
 }

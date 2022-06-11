@@ -467,7 +467,7 @@ public class ZooPanel extends JPanel implements Runnable {
             waiting_queue.add(animal);
             JOptionPane.showMessageDialog(dialog,"Animal added to waiting queue","Notification",JOptionPane.INFORMATION_MESSAGE);
         }
-        executor.execute((IAnimalInterface)animal);
+        executor.execute(animal);
         System.out.println(executor);
     }
 
