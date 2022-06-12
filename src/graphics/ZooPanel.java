@@ -158,10 +158,10 @@ public class ZooPanel extends JPanel implements Runnable {
         boolean flag = false;
         for (IAnimalInterface animal : animal_list){
             if (animal.getChanges()) {
-                synchronized (animal) {
+                synchronized (animal.getAnimal()) {
                     animal.setChanges(false);
                     flag = true;
-                    animal.notifyAll();
+                    animal.getAnimal().notifyAll();
                 }
             }
         }
@@ -299,9 +299,9 @@ public class ZooPanel extends JPanel implements Runnable {
                 public void actionPerformed(ActionEvent e) {
                     if (num_of_Animals > 0) {
                         for (IAnimalInterface animal : animal_list) {
-                            synchronized (animal) {
-                                animal.setResumed();
-                                animal.notifyAll();
+                            synchronized (animal.getAnimal()) {
+                                animal.getAnimal().setResumed();
+                                animal.getAnimal().notifyAll();
                             }
                         }
                     }
@@ -373,8 +373,9 @@ public class ZooPanel extends JPanel implements Runnable {
             this.animal_color.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if(animal_list.size() >0)
+                    if(animal_list.size() >0) {
                         new ChangeColorDialog();
+                    }
                     else
                         JOptionPane.showMessageDialog(button_panel,"Animals do not exist.","Error",JOptionPane.ERROR_MESSAGE);
                 }

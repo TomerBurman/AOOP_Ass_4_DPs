@@ -23,4 +23,8 @@ public class Blue_Animal_Decorator extends Animal_Decorator{
     public String getColor() {
         return "Blue";
     }
+
+    public String toString(){
+        return "Blue" + this.getAnimal().toString();
+    }
 }

@@ -43,15 +43,15 @@ public class ChangeColorDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource().equals(natural)) {
-            IAnimalInterface animal = (new Natural_Animal_Decorator(animal_to_change.getAnimal())).getAnimal();
+            IAnimalInterface animal = (new Natural_Animal_Decorator(animal_to_change.getAnimal()));
             ZooPanel.getAnimalList().set(animal_Index, animal);
         }
         else if(e.getSource().equals(red)) {
-            IAnimalInterface animal = new Red_Animal_Decorator(animal_to_change.getAnimal()).getAnimal();
+            IAnimalInterface animal = new Red_Animal_Decorator(animal_to_change.getAnimal());
             ZooPanel.getAnimalList().set(animal_Index, animal);
         }
         else if(e.getSource().equals(blue)) {
-            IAnimalInterface animal = (new Blue_Animal_Decorator(animal_to_change.getAnimal())).getAnimal();
+            IAnimalInterface animal = (new Blue_Animal_Decorator(animal_to_change.getAnimal()));
             ZooPanel.getAnimalList().set(animal_Index, animal);
         }
         else if(e.getSource().equals(animals_list)){
@@ -59,4 +59,6 @@ public class ChangeColorDialog implements ActionListener {
            animal_Index = animals_list.getSelectedIndex();
         }
     }
+
+
 }

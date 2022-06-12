@@ -77,5 +77,9 @@ public abstract class Animal_Decorator implements IAnimalInterface {
         animal.run();
     }
 
+    public String toString() {
+        return null;
+    }
+
 
 }
