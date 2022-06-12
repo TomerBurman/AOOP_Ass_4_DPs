@@ -452,15 +452,15 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
     @Override
     public void run() {
         while (!exit) {
+            System.out.println("running");
             if (threadSuspended == true) {
-                synchronized (this) {
                     try {
                         update();
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
+
             }
             int x = getLocation().getX();
             int y = getLocation().getY();
@@ -508,14 +508,15 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
                 synchronized (this) {
                     this.move(new Point(x + horSpeed * x_dir, y + verSpeed * y_dir));
                     coordChanged = true;
+                }
                     try {
                         update();
-                        Thread.sleep(100);
+                        Thread.sleep(150);
                     }
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }
+
 
         }
         synchronized (this) {
@@ -530,7 +531,10 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
     }
 
 
-
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
 
 

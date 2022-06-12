@@ -34,17 +34,18 @@ public class ZooPanel extends JPanel{
     private static final int corePool = 10;
     private static final int maximumPoolSize = 10;
     private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(5);
-    private static final BlockingQueue<IAnimalInterface> waiting_queue = new ArrayBlockingQueue<>(5);
+    private static BlockingQueue<IAnimalInterface> waiting_queue = new ArrayBlockingQueue<>(5);
 
 
     private static ExecutorService executor;
     private static JDialog dialog;
-    private static final ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
+    private static ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
     private static drawPanel draw_panel;
     private static ButtonPanel button_panel;
     private static ImageIcon backGround = null;
     private static IEdible food=null;
 
+    private Caretaker caretaker = new Caretaker();
 
     private volatile static ZooPanel instance=null;
 
@@ -106,9 +107,9 @@ public class ZooPanel extends JPanel{
                                 if (waiting_queue.size() != 0)
                                     animal_list.add(waiting_queue.poll());
 
-                                        animal2.getAnimal().setThreadExit(true);
+                                animal2.getAnimal().setThreadExit(true);
 
-                                        animal2.getAnimal().notifyAll();
+                                animal2.getAnimal().notifyAll();
 
 
                             }
@@ -125,7 +126,7 @@ public class ZooPanel extends JPanel{
             if (food != null) { // if food was placed on the screen
                 for (IAnimalInterface animal_dec : animal_list) {
                     Animal animal = animal_dec.getAnimal();
-                    synchronized (animal) {
+                    synchronized (animal.getAnimal()) {
                         if (animal.getDiet().canEat(food.getFoodType())) {
                             animal.setExistingFood(true);
                             if (animal.calcDistance(new Point(draw_panel.getWidth() / 2, draw_panel.getHeight() / 2 + 12)) <= animal.getEAT_DISTANCE()) {
@@ -198,6 +199,14 @@ public class ZooPanel extends JPanel{
      */
    public static ArrayList<IAnimalInterface> getAnimalList(){return animal_list;}
 
+    public static BlockingQueue<IAnimalInterface> getAnimalQueue() {
+       return waiting_queue;
+    }
+
+    public static void setWaitingQueue(BlockingQueue<IAnimalInterface> stateOfWaiting) {
+       waiting_queue = stateOfWaiting;
+    }
+
     /**
      * Get Controller thread
      * @return controller thread
@@ -226,6 +235,10 @@ public class ZooPanel extends JPanel{
         private JButton food = new JButton("Food");
         private JButton animal_color = new JButton("Change Color");
         private JButton info = new JButton("Info");
+
+        private JButton save_Button = new JButton("Save");
+
+        private JButton load_Button = new JButton("Load");
         private JButton exit = new JButton("Exit");
 
 
@@ -245,6 +258,8 @@ public class ZooPanel extends JPanel{
             this.add(wake_up);
             this.add(clear);
             this.add(food);
+            this.add(save_Button);
+            this.add(load_Button);
             this.add(animal_color);
             this.add(info);
             this.add(exit);
@@ -335,7 +350,7 @@ public class ZooPanel extends JPanel{
                     if(animal_list.size() > 0) {
                         for(IAnimalInterface animal_dec : animal_list) {
                             Animal animal = animal_dec.getAnimal();
-                            synchronized (animal) {
+                            synchronized (animal.getAnimal()) {
                                 animal.setThreadExit(true);
                                 try {
                                     animal.wait();
@@ -376,6 +391,28 @@ public class ZooPanel extends JPanel{
                 }
             });
 
+            this.save_Button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    caretaker.save();
+
+                }
+            });
+            this.load_Button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(caretaker.getSizeofList() > 0) {
+                        for (IAnimalInterface animal : animal_list)
+                            animal.getAnimal().setThreadExit(true);
+
+                        caretaker.load();
+                        for(IAnimalInterface animal : animal_list){
+                            executor.execute(animal.getAnimal());
+                        }
+
+                    }
+                }
+            });
             this.exit.addActionListener(new ActionListener() {
                 /**
                  * exit button was pressed - JOptionPane message will pop up and exit the system.
@@ -498,5 +535,11 @@ public class ZooPanel extends JPanel{
         }
 
 
+
+
+        }
+    public static void setAnimalList(ArrayList<IAnimalInterface> list){
+        animal_list = list;
     }
+
 }
