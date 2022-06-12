@@ -70,6 +70,8 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
     protected final static String default_color = "Natural";
     private String photo_name;
 
+    public Observer_interface observer = ZooPanel.Controller_Observer.makeInstance();
+
 
     /**
      * Animal constructor
@@ -103,6 +105,15 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
         return false;
     }
 
+
+    @Override
+    public void update(){
+        observer.update();
+    }
+    @Override
+    public void subscribe(Observer_interface observer){
+        this.observer = observer;
+    }
     /**
      * setting weight of the animal.
      *
@@ -444,7 +455,8 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
             if (threadSuspended == true) {
                 synchronized (this) {
                     try {
-                        wait();
+                        update();
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -497,7 +509,8 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
                     this.move(new Point(x + horSpeed * x_dir, y + verSpeed * y_dir));
                     coordChanged = true;
                     try {
-                        wait();
+                        update();
+                        Thread.sleep(100);
                     }
                     catch (InterruptedException e) {
                         e.printStackTrace();
@@ -515,6 +528,9 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
     public Animal getAnimal() {
         return this;
     }
+
+
+
 }
 
 

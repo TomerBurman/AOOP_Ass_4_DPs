@@ -113,7 +113,7 @@ public class ZooFrame extends JFrame {
         this.pack();
         this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        panel.getController().start();
+        //panel.getController().start();
     }
 
     /**

@@ -3,6 +3,7 @@ package animals;
 import food.EFoodType;
 import food.IEdible;
 import graphics.IAnimalInterface;
+import graphics.Observer_interface;
 import graphics.ZooPanel;
 
 import java.awt.*;
@@ -79,6 +80,16 @@ public abstract class Animal_Decorator implements IAnimalInterface {
 
     public String toString() {
         return null;
+    }
+
+    @Override
+    public void update() {
+        this.getAnimal().update();
+    }
+
+    @Override
+    public void subscribe(Observer_interface observer) {
+        this.getAnimal().subscribe(observer);
     }
 
 

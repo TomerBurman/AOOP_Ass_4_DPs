@@ -17,7 +17,7 @@ import java.util.concurrent.*;
  * @author : Oran Bourak, Tomer Burman
  * @version :1
  */
-public class ZooPanel extends JPanel implements Runnable {
+public class ZooPanel extends JPanel{
     /**
      * num_of_Animals - number of animals in the zoo
      * max_animals - max animals allowed.
@@ -44,7 +44,6 @@ public class ZooPanel extends JPanel implements Runnable {
     private static ButtonPanel button_panel;
     private static ImageIcon backGround = null;
     private static IEdible food=null;
-    private Thread controller;
 
 
     private volatile static ZooPanel instance=null;
@@ -76,8 +75,6 @@ public class ZooPanel extends JPanel implements Runnable {
         button_panel = new ButtonPanel();
         this.add(button_panel,BorderLayout.SOUTH); // button panel
         this.add(draw_panel,BorderLayout.CENTER); // painting panel
-        this.controller = new Thread(this);
-        controller.setName("ZooPanel");
         executor = new ThreadPoolExecutor(corePool,maximumPoolSize,5,TimeUnit.SECONDS,queue,new RejectionHandler());
 
 
@@ -87,7 +84,7 @@ public class ZooPanel extends JPanel implements Runnable {
      * manageZoo - keeps track on if there are  any changes in our zoo
      * if there are, handles the changes and calls draw_panel repaint.
      */
-    public void manageZoo() {
+    public static void manageZoo() {
             if (animal_list.size() != num_of_Animals) { // in cases: 1) Clear animal button is pressed , 2)one of the animals has been eaten
                 num_of_Animals = animal_list.size();
                 draw_panel.repaint();
@@ -104,14 +101,14 @@ public class ZooPanel extends JPanel implements Runnable {
                     animal2 = animal_list.get(j).getAnimal();
                     if (animal1.getWeight() > 2 * animal2.getWeight() && animal1.calcDistance(animal2.getLocation()) <= animal2.getSize() && animal1 != animal2)
                         if (animal1.eat(animal2)) {
-                            synchronized (animal2) {
+                            synchronized (animal2.getAnimal()) {
                                 animal_list.remove(j);
                                 if (waiting_queue.size() != 0)
                                     animal_list.add(waiting_queue.poll());
 
-                                        animal2.setThreadExit(true);
+                                        animal2.getAnimal().setThreadExit(true);
 
-                                        animal2.notifyAll();
+                                        animal2.getAnimal().notifyAll();
 
 
                             }
@@ -205,9 +202,7 @@ public class ZooPanel extends JPanel implements Runnable {
      * Get Controller thread
      * @return controller thread
      */
-    public Thread getController() {
-        return controller;
-    }
+
 
     /**
      * ButtonPanel - extends JPanel, represents a Button panel that has
@@ -435,17 +430,6 @@ public class ZooPanel extends JPanel implements Runnable {
     }
 
 
-    @Override
-    public void run() {
-        while (true) {
-            manageZoo();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
 
     /**
@@ -485,4 +469,34 @@ public class ZooPanel extends JPanel implements Runnable {
     }
 
 
+    public static class Controller_Observer implements Observer_interface {
+
+        private static Controller_Observer instance = null;
+
+        public static Controller_Observer makeInstance(){
+            if(instance == null){
+                synchronized (Controller_Observer.class){
+                    if(instance == null) {
+                        instance = new Controller_Observer();
+                    }
+
+                }
+
+            }
+            return instance;
+        }
+        private Controller_Observer(){
+
+        }
+
+
+        @Override
+        public void update(){
+            ZooPanel.manageZoo();
+
+
+        }
+
+
+    }
 }

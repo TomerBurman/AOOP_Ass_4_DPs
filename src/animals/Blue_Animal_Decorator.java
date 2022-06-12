@@ -1,5 +1,7 @@
 package animals;
 
+import graphics.Observer_interface;
+
 import java.awt.*;
 
 public class Blue_Animal_Decorator extends Animal_Decorator{
@@ -27,4 +29,6 @@ public class Blue_Animal_Decorator extends Animal_Decorator{
     public String toString(){
         return "Blue" + this.getAnimal().toString();
     }
+
+
 }
