@@ -25,6 +25,6 @@ public class Red_Animal_Decorator extends Animal_Decorator {
     }
 
     public String toString(){
-        return  "Red "+super.toString();
+        return "Red" + this.getAnimal().toString();
     }
 }

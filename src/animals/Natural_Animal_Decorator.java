@@ -26,6 +26,6 @@ public class Natural_Animal_Decorator extends Animal_Decorator{
     }
 
     public String toString(){
-        return "Natural " +super.toString() ;
+        return "Natural" + this.getAnimal().toString();
     }
 }
