@@ -266,6 +266,7 @@ public class AddAnimalDialog extends JDialog {
             this.add(changing_param);
             this.add(changing_f);
             this.add(color);
+            changing_param.setVisible(false);
             color.setBackground(Color.WHITE);
         }
     }
@@ -333,7 +334,7 @@ public class AddAnimalDialog extends JDialog {
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
-                        field.changing_f.setVisible(!field.fields[index].equals("")); // if not lion changing field is visible.
+                        field.changing_f.setVisible(false); // if not lion changing field is visible.
                         field.changing_param.setText(field.fields[index]);
                         field.setVisible(true);
                         repaint();
