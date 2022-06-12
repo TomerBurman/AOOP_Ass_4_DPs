@@ -452,9 +452,11 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
     @Override
     public void run() {
         while (!exit) {
-            System.out.println("running");
             if (threadSuspended == true) {
                     try {
+                        synchronized (this) {
+                            wait();
+                        }
                         update();
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -520,7 +522,6 @@ public abstract class Animal extends Mobile implements IAnimalInterface {
 
         }
         synchronized (this) {
-            System.out.println("done");
             this.notifyAll();
         }
     }

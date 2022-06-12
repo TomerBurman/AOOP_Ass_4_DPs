@@ -28,6 +28,11 @@ public class Caretaker {
             Memento m = memento_list.get(0);
             memento_list.remove(0);
             originator.restore(m);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             JOptionPane.showMessageDialog(ZooPanel.getDraw_panel(),"Loaded successfully","Load",JOptionPane.INFORMATION_MESSAGE);
 
         }

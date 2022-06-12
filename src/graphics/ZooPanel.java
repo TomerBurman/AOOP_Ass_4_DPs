@@ -33,13 +33,13 @@ public class ZooPanel extends JPanel{
     private static final int max_animals = 10;
     private static final int corePool = 10;
     private static final int maximumPoolSize = 10;
-    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(5);
+    private volatile static BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(5);
     private static BlockingQueue<IAnimalInterface> waiting_queue = new ArrayBlockingQueue<>(5);
 
 
     private static ExecutorService executor;
     private static JDialog dialog;
-    private static ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
+    private volatile static ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
     private static drawPanel draw_panel;
     private static ButtonPanel button_panel;
     private static ImageIcon backGround = null;
@@ -97,26 +97,28 @@ public class ZooPanel extends JPanel{
             int i = 0;
             Animal animal1, animal2;
             while (i < num_of_Animals) {// checks all animals with all animals, if one can eat the other.
-                animal1 = animal_list.get(i).getAnimal();
-                for (int j = 0; j < num_of_Animals; j++) {
-                    animal2 = animal_list.get(j).getAnimal();
-                    if (animal1.getWeight() > 2 * animal2.getWeight() && animal1.calcDistance(animal2.getLocation()) <= animal2.getSize() && animal1 != animal2)
-                        if (animal1.eat(animal2)) {
-                            synchronized (animal2.getAnimal()) {
-                                animal_list.remove(j);
-                                if (waiting_queue.size() != 0)
-                                    animal_list.add(waiting_queue.poll());
+                synchronized (animal_list) {
+                    animal1 = animal_list.get(i).getAnimal();
+                    for (int j = 0; j < num_of_Animals; j++) {
+                        animal2 = animal_list.get(j).getAnimal();
+                        if (animal1.getWeight() > 2 * animal2.getWeight() && animal1.calcDistance(animal2.getLocation()) <= animal2.getSize() && animal1 != animal2)
+                            if (animal1.eat(animal2)) {
+                                synchronized (animal2.getAnimal()) {
+                                    animal_list.remove(j);
+                                    if (waiting_queue.size() != 0)
+                                        animal_list.add(waiting_queue.poll());
 
-                                animal2.getAnimal().setThreadExit(true);
+                                    animal2.getAnimal().setThreadExit(true);
 
-                                animal2.getAnimal().notifyAll();
+                                    animal2.getAnimal().notifyAll();
 
 
+                                }
+                                draw_panel.repaint();
+                                i = 0;
+                                break;
                             }
-                            draw_panel.repaint();
-                            i = 0;
-                            break;
-                        }
+                    }
                 }
                 if (animal_list.size() != num_of_Animals)// in case animal has been eaten.
                     num_of_Animals--;
@@ -126,7 +128,10 @@ public class ZooPanel extends JPanel{
             if (food != null) { // if food was placed on the screen
                 for (IAnimalInterface animal_dec : animal_list) {
                     Animal animal = animal_dec.getAnimal();
-                    synchronized (animal.getAnimal()) {
+
+                    synchronized (food) {
+                        if(food == null)
+                            return;
                         if (animal.getDiet().canEat(food.getFoodType())) {
                             animal.setExistingFood(true);
                             if (animal.calcDistance(new Point(draw_panel.getWidth() / 2, draw_panel.getHeight() / 2 + 12)) <= animal.getEAT_DISTANCE()) {
@@ -205,6 +210,10 @@ public class ZooPanel extends JPanel{
 
     public static void setWaitingQueue(BlockingQueue<IAnimalInterface> stateOfWaiting) {
        waiting_queue = stateOfWaiting;
+    }
+
+    public static void setQueue(BlockingQueue<Runnable> stateOfWaiting) {
+       queue = stateOfWaiting;
     }
 
     /**
@@ -297,7 +306,7 @@ public class ZooPanel extends JPanel{
                 public void actionPerformed(ActionEvent e) {
                     if(num_of_Animals > 0 ){
                         for(IAnimalInterface animal : animal_list)
-                            animal.setSuspended();
+                            animal.getAnimal().setSuspended();
                     }
                     else
                         JOptionPane.showMessageDialog(dialog,"No animals available","Error message",JOptionPane.WARNING_MESSAGE);
@@ -307,7 +316,7 @@ public class ZooPanel extends JPanel{
             this.wake_up.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (num_of_Animals > 0) {
+                    if (animal_list.size()> 0) {
                         for (IAnimalInterface animal : animal_list) {
                             synchronized (animal.getAnimal()) {
                                 animal.getAnimal().setResumed();
@@ -351,9 +360,10 @@ public class ZooPanel extends JPanel{
                         for(IAnimalInterface animal_dec : animal_list) {
                             Animal animal = animal_dec.getAnimal();
                             synchronized (animal.getAnimal()) {
+                                animal.getAnimal().notifyAll();
                                 animal.setThreadExit(true);
                                 try {
-                                    animal.wait();
+                                    animal.getAnimal().wait();
                                 } catch (InterruptedException ex) {
                                     throw new RuntimeException(ex);
                                 }
@@ -365,7 +375,7 @@ public class ZooPanel extends JPanel{
                     }
                     else
                         JOptionPane.showMessageDialog(button_panel,"Animals do not exist.","Error",JOptionPane.ERROR_MESSAGE);
-
+                    draw_panel.repaint();
                 }
             });
             this.food.addActionListener(new ActionListener() {
@@ -401,16 +411,24 @@ public class ZooPanel extends JPanel{
             this.load_Button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    queue.clear();
                     if(caretaker.getSizeofList() > 0) {
-                        for (IAnimalInterface animal : animal_list)
-                            animal.getAnimal().setThreadExit(true);
+                        synchronized (animal_list) {
+                            for (IAnimalInterface animal : animal_list)
+                                animal.getAnimal().setThreadExit(true);
 
-                        caretaker.load();
-                        for(IAnimalInterface animal : animal_list){
-                            executor.execute(animal.getAnimal());
+                            caretaker.load();
+                            for (IAnimalInterface animal : animal_list) {
+                                executor.execute(animal.getAnimal());
+                            }
+                            draw_panel.repaint();
+
+                            for (Runnable Animal : waiting_queue)
+                                queue.add(Animal);
                         }
-
                     }
+                    else
+                        JOptionPane.showMessageDialog(ZooPanel.getDraw_panel(),"No saved states are exist","Error",JOptionPane.ERROR_MESSAGE);
                 }
             });
             this.exit.addActionListener(new ActionListener() {
@@ -490,7 +508,6 @@ public class ZooPanel extends JPanel{
             JOptionPane.showMessageDialog(dialog,"Animal added to waiting queue","Notification",JOptionPane.INFORMATION_MESSAGE);
         }
         executor.execute(animal);
-        System.out.println(executor);
     }
 
     /**

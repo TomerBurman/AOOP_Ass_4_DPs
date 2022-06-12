@@ -9,17 +9,16 @@ public class Memento {
     private ArrayList<IAnimalInterface> animal_list = new ArrayList<>();
     private BlockingQueue<IAnimalInterface> animal_queue = new ArrayBlockingQueue<>(5);
 
-    private BlockingQueue<IAnimalInterface> queue = new ArrayBlockingQueue<>(5);
 
 
-    public Memento(ArrayList<IAnimalInterface> list,BlockingQueue<IAnimalInterface> animal_queue,BlockingQueue<IAnimalInterface> queue){
+
+
+    public Memento(ArrayList<IAnimalInterface> list,BlockingQueue<IAnimalInterface> animal_queue){
         try {
             for(IAnimalInterface animal : list)
                 animal_list.add((IAnimalInterface) animal.getAnimal().clone());
             for(IAnimalInterface animal : animal_queue)
                 this.animal_queue.add((IAnimalInterface) animal.getAnimal().clone());
-
-
 
         }
         catch(ClassCastException e){
@@ -35,4 +34,6 @@ public class Memento {
     public BlockingQueue<IAnimalInterface> getStateOfWaiting() {
         return animal_queue;
     }
+
+
 }
