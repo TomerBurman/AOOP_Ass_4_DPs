@@ -1,6 +1,7 @@
 package graphics;
 
 import animals.Animal;
+import animals.Animal_Decorator;
 import food.IEdible;
 import mobility.Point;
 
@@ -161,7 +162,9 @@ public class ZooPanel extends JPanel implements Runnable {
                 synchronized (animal) {
                     animal.setChanges(false);
                     flag = true;
-                    animal.notifyAll();
+                    synchronized (animal.getAnimal()) {
+                        animal.getAnimal().notifyAll();
+                    }
                 }
             }
         }
@@ -301,7 +304,9 @@ public class ZooPanel extends JPanel implements Runnable {
                         for (IAnimalInterface animal : animal_list) {
                             synchronized (animal) {
                                 animal.setResumed();
-                                animal.notifyAll();
+                                synchronized (animal.getAnimal()) {
+                                    animal.getAnimal().notifyAll();
+                                }
                             }
                         }
                     }

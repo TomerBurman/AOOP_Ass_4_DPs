@@ -24,4 +24,8 @@ public class Natural_Animal_Decorator extends Animal_Decorator{
     public String getColor() {
         return "Natural";
     }
+
+    public String toString(){
+        return "Natural " +super.toString() ;
+    }
 }
