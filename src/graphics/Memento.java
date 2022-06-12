@@ -17,8 +17,6 @@ public class Memento {
         try {
             for(IAnimalInterface animal : list)
                 animal_list.add((IAnimalInterface) animal.getAnimal().clone());
-            for(IAnimalInterface animal : animal_queue)
-                this.animal_queue.add((IAnimalInterface) animal.getAnimal().clone());
 
         }
         catch(ClassCastException e){

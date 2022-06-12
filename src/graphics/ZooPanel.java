@@ -237,12 +237,12 @@ public class ZooPanel extends JPanel{
          * info - Info button
          * exit - Exit button
          */
-        private JButton add_Animal = new JButton("Add Animal"); //getcontent
+        private JButton add_Animal = new JButton("Add"); //getcontent
         private JButton sleep = new JButton("Sleep");
         private JButton wake_up = new JButton("Wake up");
         private JButton clear = new JButton("Clear");
         private JButton food = new JButton("Food");
-        private JButton animal_color = new JButton("Change Color");
+        private JButton animal_color = new JButton("Color");
         private JButton info = new JButton("Info");
 
         private JButton save_Button = new JButton("Save");
@@ -256,12 +256,12 @@ public class ZooPanel extends JPanel{
          * buttons are seperated between themselves.
          */
         ButtonPanel(){
-            this.setPreferredSize(new Dimension(800,30));
+            this.setPreferredSize(new Dimension(820,30));
             this.setBackground(new Color(0,0,255));
             animalButton();
             GridLayout lay = new GridLayout(1,0);
             this.setLayout(lay);
-            lay.setHgap(5);
+            lay.setHgap(0);
             this.add(add_Animal);
             this.add(sleep);
             this.add(wake_up);
